@@ -1,0 +1,56 @@
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import math
+%matplotlib inline
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
+
+
+titanic=pd.read_csv("C:\\Users\\User\\Downloads\\train.csv")
+titanic.head(5)
+
+
+print("no. of passenger survived {}".format(str(len(titanic.index))))
+sns.countplot(x="Survived", data=titanic)
+sns.countplot(x="Survived", hue="Sex", data=titanic)
+sns.countplot(x="Sex",data=titanic)
+sns.countplot(x="Survived",hue="Pclass",data=titanic )
+titanic["Age"].plot.hist()
+titanic["Fare"].plot.hist(bins=20,figsize=(10,5))
+titanic.info()
+
+
+titanic.isnull()
+titanic.isnull().sum()
+sns.boxplot(x="Pclass",y="Age",data=titanic)
+titanic.dropna(inplace=True)
+sns.heatmap(titanic.isnull(),yticklabels=False,cbar=False)
+titanic.isnull().sum()
+sex=pd.get_dummies(titanic["Sex"],drop_first=True)
+sex.head()
+embark=pd.get_dummies(titanic['Embarked'],drop_first=True)
+embark.head()
+pclass=pd.get_dummies(titanic['Pclass'],drop_first=True)
+pclass.head()
+titanic=pd.concat([titanic,sex,embark,pclass],axis=1)
+titanic.drop(['Sex','Embarked','PassengerId','Pclass','Ticket'],axis=1,inplace=True)
+titanic.drop('Fare',axis=1,inplace=True)
+titanic.head()
+
+
+X=titanic.drop("Survived",axis=1)
+y=titanic['Survived']
+X_train,X_test,y_train,y_test= train_test_split(X,y,test_size=0.3,random_state=21)
+logreg = LogisticRegression()
+logreg.fit(X_train, y_train)
+pred= logreg.predict(X_test)
+X=titanic.drop("Survived",axis=1)
+y=titanic['Survived']
+classification_report(y_test,pred)
+confusion_matrix(y_test,pred)
+accuracy_score(y_test,pred)
